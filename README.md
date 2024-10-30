@@ -1,9 +1,9 @@
-
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 # `{pilzLernAppGolem}`
 
 <!-- badges: start -->
+
 <!-- badges: end -->
 
 ## Installation

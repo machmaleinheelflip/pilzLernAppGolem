@@ -7,8 +7,12 @@ Description: The pilzLernAppGolem is made to learn Mushrooms simular to
     computer birding with guissing the mushrooms species by seing an image
     of it.
 License: MIT + file LICENSE
+Depends: 
+    R (>= 2.10)
 Imports: 
+    base64enc,
     config,
+    dplyr,
     golem,
     shiny
 Encoding: UTF-8

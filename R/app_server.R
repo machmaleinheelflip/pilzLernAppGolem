@@ -6,4 +6,5 @@
 #' @noRd
 app_server <- function(input, output, session) {
   # Your application server logic
+  mod_shroom_img_quiz_server("shroom_img_quiz_1")
 }
