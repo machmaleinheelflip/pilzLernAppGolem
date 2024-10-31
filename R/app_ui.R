@@ -10,10 +10,18 @@ app_ui <- function(request) {
     golem_add_external_resources(),
     # Your application UI logic
     fluidPage(
-      mod_shroom_img_quiz_ui("shroom_img_quiz_1")
+      titlePanel("Mushroom Learning and Gallery App"),
+      # Adding tabsetPanel to switch between different modules
+      tabsetPanel(
+        tabPanel("Mushroom Quiz",
+                 mod_shroom_img_quiz_ui("shroom_img_quiz_1")),  # Tab for the quiz
+        tabPanel("Species Gallery",
+                 mod_species_gallery_ui("species_gallery_1"))  # Tab for the image gallery
+      )
     )
   )
 }
+
 
 #' Add external Resources to the Application
 #'

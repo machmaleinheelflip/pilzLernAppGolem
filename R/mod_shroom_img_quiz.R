@@ -37,14 +37,15 @@ mod_shroom_img_quiz_ui <- function(id) {
     moduleServer(id, function(input, output, session) {
       ns <- session$ns
 
-      unique_species_german <- unique(my_dataset$species_german)  # Assuming this is your species list
+      # browser()
+      unique_species_german <- unique(my_dataset$species)  # Assuming this is your species list
       values <- reactiveValues(current_species = unique_species_german[1])
 
       # Setup reactable table
       output$species_table <- renderReactable({
         # browser()
         reactable(my_dataset %>%
-                    select(species_german) %>%
+                    select(species) %>%
                     unique(),
                   onClick = "select",
                   selection = "single",
@@ -57,7 +58,7 @@ mod_shroom_img_quiz_ui <- function(id) {
                   ),
                   defaultSelected = NULL,
                   columns = list(
-                    species_german = colDef(name = "Species",
+                    species = colDef(name = "Species",
                                             cell = function(value) {
                                               htmltools::tags$div(style = "cursor: pointer;", value)
                                               })
@@ -111,7 +112,7 @@ mod_shroom_img_quiz_ui <- function(id) {
 
         # Filter images for the current species
         current_images <- my_dataset %>%
-          filter(species_german == current_species_german) %>%
+          filter(species == current_species_german) %>%
           pull(local_path)
 
         # Encode each image to base64, handle if there are fewer than 3 images
