@@ -3,6 +3,7 @@
 export(run_app)
 import(base64enc)
 import(dplyr)
+import(reactable)
 import(shiny)
 importFrom(golem,activate_js)
 importFrom(golem,add_resource_path)
