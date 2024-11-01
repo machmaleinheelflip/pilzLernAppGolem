@@ -19,7 +19,8 @@ mod_shroom_img_quiz_ui <- function(id) {
         sidebarPanel(
           reactableOutput(ns("species_table")),  # Table for selecting species
           br(),
-          textOutput(ns("feedback"))
+          textOutput(ns("feedback")),
+          actionButton(ns("show_solution"), "Isch wes et net")
         ),
         mainPanel(
           uiOutput(ns("mushroom_images"))  # Display images in tabs for each species
@@ -44,50 +45,95 @@ mod_shroom_img_quiz_ui <- function(id) {
       # Setup reactable table
       output$species_table <- renderReactable({
         # browser()
-        reactable(my_dataset %>%
-                    select(species) %>%
-                    unique(),
-                  onClick = "select",
-                  selection = "single",
-                  striped = TRUE,
-                  resizable = TRUE,
-                  highlight = TRUE,
-                  borderless = TRUE,
-                  theme = reactableTheme(
-                    rowSelectedStyle = list(backgroundColor = "#eee", boxShadow = "inset 2px 0 0 0 #ffa62d")
-                  ),
-                  defaultSelected = NULL,
-                  columns = list(
-                    species = colDef(name = "Species",
-                                            cell = function(value) {
-                                              htmltools::tags$div(style = "cursor: pointer;", value)
-                                              })
+
+        random_specs <- my_dataset %>%
+          select(species) %>%
+          unique() %>%
+          # pull(species) %>%
+          slice_sample(n=3) %>%
+          bind_rows(data.frame(species= values$current_species)) %>%
+          unique()
+
+        reactable(
+          # my_dataset %>%
+          #   select(species) %>%
+          #   unique(),
+          random_specs,
+          onClick = "select",
+          selection = "single",
+          resizable = TRUE,
+          highlight = TRUE,
+          theme = reactableTheme(
+            rowSelectedStyle = list(backgroundColor = "#eee", boxShadow = "inset 2px 0 0 0 #ffa62d")
+          ),
+          compact = TRUE,
+          striped = TRUE,
+          borderless = TRUE,
+          pagination = FALSE,
+          sortable = TRUE,
+          showSortable = TRUE,
+          defaultColDef = colDef(
+            defaultSortOrder = "desc",
+            align = "left",
+            cell = reactablefmtr::data_bars(
+              data = .,
+              fill_color = viridis::mako(1000),
+              background = "#ffffff",
+              text_position = "outside-end",
+              number_fmt = scales::comma
+            )
+          ),
+          defaultSelected = NULL,
+          columns = list(
+            species = colDef(name = "Species",
+                                    # cell = function(value) {
+                                    #   htmltools::tags$div(style = "cursor: pointer;", value)
+                                    #   }
+                             )
         ))
       })
 
       selected_row_index <-reactive(reactable::getReactableState("species_table", "selected", session))
+
+      # show_solution_react <- reactiveVal(0)
+      observeEvent(input$show_solution, {
+        # show_solution_react(show_solution_react() +1)
+
+        values$feedback <- paste("Oooh da musch aber übe. Des isch der", values$current_species)
+
+        # Deselect selected
+        updateReactable(outputId = "species_table",
+                        data = my_dataset %>%
+                          select(species) %>%
+                          unique() %>%
+                          slice_sample(n=3) %>%
+                          bind_rows(data.frame(species= values$current_species)) %>%
+                          unique(),
+                        selected = NA)
+      })
 
       observeEvent(selected_row_index(), {
         # browser()
         selected_species <- unique_species_german[selected_row_index()]
         if (selected_species == values$current_species) {
           values$feedback <- "Richtig! Weiter zum nächsten Bild."
+
+          # Deselect selected
+          updateReactable(outputId = "species_table",
+                          data = my_dataset %>%
+                            select(species) %>%
+                            unique() %>%
+                            slice_sample(n=3) %>%
+                            bind_rows(data.frame(species= values$current_species)) %>%
+                            unique(),
+                          selected = NA)
         } else {
           values$feedback <- "Falsch. Bitte erneut versuchen."
+          # Deselect selected
+          updateReactable(outputId = "species_table",
+                          selected = NA)
         }
       })
-
-      # Observe selections in the reactable table
-      # observeEvent(input[[ns("species_table_selection")]], {
-      #   selected_index <- input[[ns("species_table_selection")]]
-      #   selected_species <- unique_species_german[selected_index]
-      #
-      #   if (selected_species == values$current_species) {
-      #     values$feedback <- "Richtig! Weiter zum nächsten Bild."
-      #   } else {
-      #     values$feedback <- "Falsch. Bitte erneut versuchen."
-      #   }
-      # })
 
       # Update feedback
       output$feedback <- renderText({
@@ -96,11 +142,21 @@ mod_shroom_img_quiz_ui <- function(id) {
 
       # Suppose you have a method to change the current species when correct
       observeEvent(values$feedback, {
-        if (values$feedback == "Richtig! Weiter zum nächsten Bild.") {
+        if (values$feedback == "Richtig! Weiter zum nächsten Bild." || values$feedback == paste("Oooh da musch aber übe. Des isch der", values$current_species)) {
           # Rotate to the next species in a cyclic manner
           next_index <- match(values$current_species, unique_species_german) %% length(unique_species_german) + 1
           values$current_species <- unique_species_german[next_index]
         }
+
+        # Deselect selected
+        updateReactable(outputId = "species_table",
+                        data = my_dataset %>%
+                          select(species) %>%
+                          unique() %>%
+                          slice_sample(n=3) %>%
+                          bind_rows(data.frame(species= values$current_species)) %>%
+                          unique(),
+                        selected = NA)
       })
 
 

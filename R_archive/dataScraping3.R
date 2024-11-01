@@ -77,6 +77,26 @@ process_species <- function(species) {
     ungroup() %>%
     select(-image_id)
 
+  # Function to retrieve German common names for a list of species keys
+  get_german_names <- function(species_keys) {
+    sapply(species_keys, function(key) {
+      # Fetch vernacular names for the given species key
+      common_names <- name_usage(key = key, data = "vernacularNames")
+
+      # Filter for German common names
+      german_name <- common_names$data %>%
+        filter(language == "deu") %>%
+        pull(vernacularName)
+
+      # Return the first German name if available, otherwise NA
+      if (length(german_name) > 0) {
+        return(german_name[1])
+      } else {
+        return(NA)
+      }
+    }, USE.NAMES = FALSE)
+  }
+
   # Fetch German names and combine with old data
   if (nrow(data1) > 0) {
     data1$species_german <- tryCatch({
@@ -99,10 +119,15 @@ process_species <- function(species) {
 # lapply(species_list, process_species)
 
 species_list <- read.delim2("data-raw/iNaturalistResearchGradeObservations_europe.csv") %>% select(speciesKey) %>% unique() %>% filter(!is.na(speciesKey))
+# TODO Hier evtl nach irgwas sortieren (e.g. speciesKey), um nochmal bissi sicherer zu sein, dass ich alles nur einmal downloade ... ganz vlt wird beim einlesen zufällig sortiert ??
+
+species_list_1_5 <- species_list$speciesKey[1:5] # done
 species_list_1_30 <- species_list$speciesKey[1:30] # done
 species_list_31_100 <- species_list$speciesKey[31:100] # done
 # species_list_101_200 <- species_list$speciesKey[101:200] # done
-lapply(species_list_31_100, process_species)
+lapply(species_list_1_5, process_species)
 
+
+get_german_names(species_list_1_5[2])
 
 
