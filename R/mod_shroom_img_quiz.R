@@ -13,18 +13,16 @@
 mod_shroom_img_quiz_ui <- function(id) {
   ns <- NS(id)
   tagList(
-    fluidPage(
-      titlePanel("Mushroom Learning App"),
-      sidebarLayout(
-        sidebarPanel(
-          reactableOutput(ns("species_table")),  # Table for selecting species
-          br(),
-          textOutput(ns("feedback")),
-          actionButton(ns("show_solution"), "Isch wes et net")
-        ),
-        mainPanel(
-          uiOutput(ns("mushroom_images"))  # Display images in tabs for each species
-        )
+    layout_columns(
+      col_widths = c(4, 8),
+      card(
+        uiOutput(ns("mushroom_images"))  # Display images in tabs for each species
+      ),
+      card(
+        reactableOutput(ns("species_table")),  # Table for selecting species
+        br(),
+        textOutput(ns("feedback")),
+        actionButton(ns("show_solution"), "Isch wes et net")
       )
     )
   )
@@ -178,7 +176,7 @@ mod_shroom_img_quiz_ui <- function(id) {
 
         # Dynamically create a tabPanel for each available image
         image_tabs <- lapply(seq_along(encoded_images), function(i) {
-          tabPanel(paste("Bild", i), tags$img(src = encoded_images[[i]], height = "400px", width = "auto", style = "margin: 10px; border-radius: 10px;"))
+          tabPanel(paste("Bild", i), tags$img(src = encoded_images[[i]], height = "auto", width = "100%", style = "margin: 10px; border-radius: 10px;"))
         })
 
         # Render the tabsetPanel with the dynamically created tabPanels

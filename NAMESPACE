@@ -2,6 +2,7 @@
 
 export(run_app)
 import(base64enc)
+import(bslib)
 import(dplyr)
 import(magick)
 import(reactable)

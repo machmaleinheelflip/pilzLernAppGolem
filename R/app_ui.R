@@ -3,22 +3,23 @@
 #' @param request Internal parameter for `{shiny}`.
 #'     DO NOT REMOVE.
 #' @import shiny
+#' @import bslib
 #' @noRd
 app_ui <- function(request) {
   tagList(
     # Leave this function for adding external resources
     golem_add_external_resources(),
     # Your application UI logic
-    fluidPage(
-      titlePanel("Mushroom Learning and Gallery App"),
+    page_navbar(
+      title = "Mushroom Learning and Gallery App",
       # Adding tabsetPanel to switch between different modules
-      tabsetPanel(
-        tabPanel("Mushroom Quiz",
-                 mod_shroom_img_quiz_ui("shroom_img_quiz_1")),  # Tab for the quiz
-        tabPanel("Species Gallery",
-                 mod_species_gallery_ui("species_gallery_1"))  # Tab for the image gallery
+    nav_panel(
+        "Mushroom Quiz",
+          mod_shroom_img_quiz_ui("shroom_img_quiz_1")),  # Tab for the quiz
+    nav_panel(
+      "Species Gallery",
+      mod_species_gallery_ui("species_gallery_1"))  # Tab for the image gallery
       )
-    )
   )
 }
 
