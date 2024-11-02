@@ -36,8 +36,11 @@ mod_shroom_img_quiz_ui <- function(id) {
     moduleServer(id, function(input, output, session) {
       ns <- session$ns
 
+      my_dataset <- my_dataset %>%
+        filter(!is.na(species_german))
+
       # browser()
-      unique_species_german <- unique(my_dataset$species)  # Assuming this is your species list
+      unique_species_german <- unique(my_dataset$species_german)  # Assuming this is your species list
       values <- reactiveValues(current_species = unique_species_german[1])
 
       # Setup reactable table
@@ -45,16 +48,16 @@ mod_shroom_img_quiz_ui <- function(id) {
         # browser()
 
         random_specs <- my_dataset %>%
-          select(species) %>%
+          select(species_german) %>%
           unique() %>%
-          # pull(species) %>%
+          # pull(species_german) %>%
           slice_sample(n=3) %>%
-          bind_rows(data.frame(species= values$current_species)) %>%
+          bind_rows(data.frame(species_german= values$current_species)) %>%
           unique()
 
         reactable(
           # my_dataset %>%
-          #   select(species) %>%
+          #   select(species_german) %>%
           #   unique(),
           random_specs,
           onClick = "select",
@@ -83,7 +86,7 @@ mod_shroom_img_quiz_ui <- function(id) {
           ),
           defaultSelected = NULL,
           columns = list(
-            species = colDef(name = "Species",
+            species_german = colDef(name = "Species",
                                     # cell = function(value) {
                                     #   htmltools::tags$div(style = "cursor: pointer;", value)
                                     #   }
@@ -102,10 +105,10 @@ mod_shroom_img_quiz_ui <- function(id) {
         # Deselect selected
         updateReactable(outputId = "species_table",
                         data = my_dataset %>%
-                          select(species) %>%
+                          select(species_german) %>%
                           unique() %>%
                           slice_sample(n=3) %>%
-                          bind_rows(data.frame(species= values$current_species)) %>%
+                          bind_rows(data.frame(species_german= values$current_species)) %>%
                           unique(),
                         selected = NA)
       })
@@ -119,10 +122,10 @@ mod_shroom_img_quiz_ui <- function(id) {
           # Deselect selected
           updateReactable(outputId = "species_table",
                           data = my_dataset %>%
-                            select(species) %>%
+                            select(species_german) %>%
                             unique() %>%
                             slice_sample(n=3) %>%
-                            bind_rows(data.frame(species= values$current_species)) %>%
+                            bind_rows(data.frame(species_german= values$current_species)) %>%
                             unique(),
                           selected = NA)
         } else {
@@ -149,10 +152,10 @@ mod_shroom_img_quiz_ui <- function(id) {
         # Deselect selected
         updateReactable(outputId = "species_table",
                         data = my_dataset %>%
-                          select(species) %>%
+                          select(species_german) %>%
                           unique() %>%
                           slice_sample(n=3) %>%
-                          bind_rows(data.frame(species= values$current_species)) %>%
+                          bind_rows(data.frame(species_german= values$current_species)) %>%
                           unique(),
                         selected = NA)
       })
@@ -166,7 +169,7 @@ mod_shroom_img_quiz_ui <- function(id) {
 
         # Filter images for the current species
         current_images <- my_dataset %>%
-          filter(species == current_species_german) %>%
+          filter(species_german == current_species_german) %>%
           pull(local_path)
 
         # Encode each image to base64, handle if there are fewer than 3 images
@@ -176,7 +179,7 @@ mod_shroom_img_quiz_ui <- function(id) {
 
         # Dynamically create a tabPanel for each available image
         image_tabs <- lapply(seq_along(encoded_images), function(i) {
-          tabPanel(paste("Bild", i), tags$img(src = encoded_images[[i]], height = "auto", width = "100%", style = "margin: 10px; border-radius: 10px;"))
+          tabPanel(paste("Bild", i), tags$img(src = encoded_images[[i]], height = "auto", width = "100%", style = "border-radius: 10px;"))
         })
 
         # Render the tabsetPanel with the dynamically created tabPanels

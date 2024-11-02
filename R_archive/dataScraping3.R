@@ -1,26 +1,26 @@
 library(dplyr)
 library(rgbif)
 
-process_species <- function(species) {
+process_species <- function(speciesKey) {
   # Load existing data
-  if (file.exists("data_4.rds")) {
-    old_data <- readRDS("data_4.rds")
+  if (file.exists("data_5.rds")) {
+    old_data <- readRDS("data_5.rds")
     old_data$speciesKey <- as.character(old_data$speciesKey) # Convert speciesKey to character
   } else {
     old_data <- data.frame()
   }
 
-  # Check if the species has already been processed
-  if (!is.null(old_data) && any(grepl(species, old_data$speciesKey, fixed = TRUE))) {
-    print(paste("Skipping already processed species:", species))
-    return(NULL)  # Skip processing this species
+  # Check if the speciesKey has already been processed
+  if (!is.null(old_data) && any(grepl(speciesKey, old_data$speciesKey, fixed = TRUE))) {
+    print(paste("Skipping already processed speciesKey:", speciesKey))
+    return(NULL)  # Skip processing this speciesKey
   }
 
-  print(paste("Starting processing for:", species))
+  print(paste("Starting processing for:", speciesKey))
 
   # Search for records
   data <- occ_search(
-    speciesKey = species,
+    speciesKey = speciesKey,
     mediaType = 'StillImage',
     limit = 3,
     hasGeospatialIssue = FALSE,
@@ -32,7 +32,7 @@ process_species <- function(species) {
     data1 <- data$data %>%
       mutate(
         scientificName = as.character(scientificName),
-        speciesKey = as.character(species),
+        speciesKey = as.character(speciesKey),
         issues = as.character(issues),
         continent = as.character(continent),
         countryCode = as.character(countryCode),
@@ -55,20 +55,20 @@ process_species <- function(species) {
     }
     data1 <- bind_cols(data1, media_url = media_urls)
   } else {
-    data1 <- data.frame(scientificName = as.character(species),
-                        speciesKey = as.character(NA), species = NA, issues = NA,
+    data1 <- data.frame(scientificName = as.character(scientificName),
+                        speciesKey = as.character(NA), speciesKey = NA, issues = NA,
                         continent = NA, countryCode = NA, media_url = NA)
   }
 
   # Filter and download images
   data1 <- data1 %>%
     filter(!is.na(media_url)) %>%
-    group_by(species) %>%
+    group_by(speciesKey) %>%
     mutate(
       image_id = row_number(),
       local_path = ifelse(!is.na(media_url),
                           {
-                            file_name <- paste0("images/", gsub(" ", "_", species), "_", image_id, ".jpeg")
+                            file_name <- paste0("images/", gsub(" ", "_", speciesKey), "_", image_id, ".jpeg")
                             download.file(media_url, file_name, mode = "wb")
                             file_name
                           },
@@ -84,9 +84,13 @@ process_species <- function(species) {
       common_names <- name_usage(key = key, data = "vernacularNames")
 
       # Filter for German common names
-      german_name <- common_names$data %>%
-        filter(language == "deu") %>%
-        pull(vernacularName)
+      german_name <- tryCatch({
+        common_names$data %>%
+          filter(language == "deu") %>%
+          pull(vernacularName)
+      }, error = function(e) {
+        return(NULL)
+      })
 
       # Return the first German name if available, otherwise NA
       if (length(german_name) > 0) {
@@ -108,9 +112,9 @@ process_species <- function(species) {
     data1$species_german <- NA
   }
 
-  print(paste("Finished processing for:", species))
+  print(paste("Finished processing for:", speciesKey))
   new_data <- bind_rows(old_data, data1)
-  saveRDS(new_data, "data_4.rds")
+  saveRDS(new_data, "data_5.rds")
   return(data1)
 }
 
@@ -118,16 +122,12 @@ process_species <- function(species) {
 # species_list <- c("Boletus edulis", "Imleria badia", "Laccaria amethystina")
 # lapply(species_list, process_species)
 
-species_list <- read.delim2("data-raw/iNaturalistResearchGradeObservations_europe.csv") %>% select(speciesKey) %>% unique() %>% filter(!is.na(speciesKey))
-# TODO Hier evtl nach irgwas sortieren (e.g. speciesKey), um nochmal bissi sicherer zu sein, dass ich alles nur einmal downloade ... ganz vlt wird beim einlesen zufällig sortiert ??
+species_list <- read.delim2("data-raw/iNaturalistResearchGradeObservations_europe.csv") %>% select(speciesKey) %>% unique() %>% filter(!is.na(speciesKey)) %>% arrange(speciesKey)
 
-species_list_1_5 <- species_list$speciesKey[1:5] # done
-species_list_1_30 <- species_list$speciesKey[1:30] # done
-species_list_31_100 <- species_list$speciesKey[31:100] # done
+# species_list_1_5 <- species_list$speciesKey[1:5]
+species_list_1_100 <- species_list$speciesKey[1:100]
 # species_list_101_200 <- species_list$speciesKey[101:200] # done
-lapply(species_list_1_5, process_species)
+lapply(species_list_1_100, process_species)
 
-
-get_german_names(species_list_1_5[2])
 
 

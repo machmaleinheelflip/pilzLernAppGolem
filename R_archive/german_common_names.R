@@ -1,0 +1,72 @@
+library(rgbif)
+library(dplyr)
+
+test <- read.delim("data-raw/iNaturalistResearchGradeObservations_europe.csv")
+
+data <- readRDS("data-raw/data_4.rds")
+length(unique(data$speciesKey))
+
+# Function to retrieve German common names for a list of species keys
+get_german_names <- function(species_keys) {
+  sapply(species_keys, function(key) {
+    # Fetch vernacular names for the given species key
+    common_names <- name_usage(key = key, data = "vernacularNames")
+
+    german_name <- tryCatch({
+      common_names$data %>%
+      filter(language == "deu") %>%
+      pull(vernacularName)
+    }, error = function(e) {
+      return(NULL)
+    })
+
+    # Return the first German name if available, otherwise NA
+    if (length(german_name) > 0) {
+      return(german_name[1])
+    } else {
+      return(NA)
+    }
+  }, USE.NAMES = FALSE)
+}
+
+# Function to retrieve German common names for a list of species keys
+data$speciesKey[1:5]
+get_german_names(data$speciesKey[1:99])
+
+
+# Fetch German names and combine with old data
+if (nrow(data) > 0) {
+  data$species_german <- tryCatch({
+    get_german_names(data$speciesKey)
+  }, error = function(e) {
+    rep(NA, nrow(data))
+  })
+} else {
+  data$species_german <- NA
+}
+
+data1 <- data %>%
+  select(speciesKey, species_german)
+
+
+
+
+
+
+
+
+
+species_list <- read.delim2("data-raw/iNaturalistResearchGradeObservations_europe.csv") %>% select(speciesKey) %>% unique() %>% filter(!is.na(speciesKey)) %>% arrange(speciesKey)
+species_list_1_5 <- species_list$speciesKey[1:5] # done
+
+common_names <- name_usage(key = species_list$speciesKey[3], data = "vernacularNames")
+
+# Filter for German common names
+tryCatch({
+  common_names$data %>%
+    filter(language == "deu") %>%
+    pull(vernacularName)
+}, error = function(e) {
+  return(NULL)
+})
+

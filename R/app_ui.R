@@ -11,7 +11,7 @@ app_ui <- function(request) {
     golem_add_external_resources(),
     # Your application UI logic
     page_navbar(
-      title = "Mushroom Learning and Gallery App",
+      title = "Mushroom Learning",
       # Adding tabsetPanel to switch between different modules
     nav_panel(
         "Mushroom Quiz",
