@@ -29,6 +29,37 @@ get_german_names <- function(species_keys) {
   }, USE.NAMES = FALSE)
 }
 
+gbif::name_usage(key = data$speciesKey[1], data = "vernacularNames")
+
+
+# Replace with your speciesKey
+species_key <- data$speciesKey[10]
+
+# Step 1: Get the taxonomic hierarchy of the species
+species_info <- name_usage(key = species_key)
+
+# Extract genusKey and familyKey
+genus_key <- species_info$data$genusKey
+family_key <- species_info$data$familyKey
+
+# Step 2: Get the German name for the genus
+name_usage(key = genus_key, data = "vernacularNames")
+genus_name <- name_usage(key = genus_key, data = "vernacularNames") %>%
+  dplyr::filter(language == "de") %>%
+  dplyr::select(vernacularName)
+
+
+
+
+
+# Name usage for a taxonomic name
+name_usage(name='Puma', rank="GENUS")
+
+# Name usage for a taxonomic name
+a <- name_usage(key='9703', language ="deu")
+
+
+
 # Function to retrieve German common names for a list of species keys
 data$speciesKey[1:5]
 get_german_names(data$speciesKey[1:99])

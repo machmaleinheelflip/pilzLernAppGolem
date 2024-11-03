@@ -122,12 +122,12 @@ process_species <- function(speciesKey) {
 # species_list <- c("Boletus edulis", "Imleria badia", "Laccaria amethystina")
 # lapply(species_list, process_species)
 
-species_list <- read.delim2("data-raw/iNaturalistResearchGradeObservations_europe.csv") %>% select(speciesKey) %>% unique() %>% filter(!is.na(speciesKey)) %>% arrange(speciesKey)
+species_list <- read.delim2("data-raw/iNaturalistResearchGradeObservations_europe.csv") %>% select(speciesKey) %>% unique() %>% filter(!is.na(speciesKey)) # %>% arrange(speciesKey)
 
 # species_list_1_5 <- species_list$speciesKey[1:5]
-species_list_1_100 <- species_list$speciesKey[1:100]
+species_list_1_200 <- species_list$speciesKey[1:200]
 # species_list_101_200 <- species_list$speciesKey[101:200] # done
-lapply(species_list_1_100, process_species)
+lapply(species_list_1_200, process_species)
 
 
 

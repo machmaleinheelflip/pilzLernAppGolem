@@ -1,0 +1,13 @@
+name: pilzLernAppGolem
+title: pilzLernAppGolem
+username: oekofor
+account: oekofor
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 13211212
+bundleId: 9305432
+url: https://oekofor.shinyapps.io/pilzLernAppGolem/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: R_archive/dataScraping3.R|R_archive/german_common_names.R|R_archive/taxtadb_test.R
