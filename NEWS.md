@@ -1,3 +1,3 @@
-# pilzLernAppGolem (development version)
+# pilzLernAppGolem 1.0.0
 
-* Initial CRAN submission.
+-   first stable version
