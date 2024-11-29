@@ -11,7 +11,7 @@
 #' @import base64enc
 #' @import reactable
 #' @import shinyalert
-mod_shroom_img_quiz_ui <- function(id) {
+mod_shroom_img_quiz2_ui <- function(id) {
   ns <- NS(id)
   tagList(
     layout_columns(
@@ -20,9 +20,9 @@ mod_shroom_img_quiz_ui <- function(id) {
         uiOutput(ns("mushroom_images"))  # Display images in tabs for each species
       ),
       card(
+        max_height = "275px",
         reactableOutput(ns("species_table")),  # Table for selecting species
-        br(),
-        textOutput(ns("feedback")),
+        # textOutput(ns("feedback")),
         actionButton(ns("show_solution"), "Isch wes et net")
       )
     )
@@ -33,7 +33,7 @@ mod_shroom_img_quiz_ui <- function(id) {
 #' shroom_img_quiz Server Functions
 #'
 #' @noRd
-  mod_shroom_img_quiz_server <- function(id) {
+  mod_shroom_img_quiz2_server <- function(id) {
     moduleServer(id, function(input, output, session) {
       ns <- session$ns
 
@@ -50,6 +50,7 @@ mod_shroom_img_quiz_ui <- function(id) {
 
       observe({
         req(values$current_species)
+        # browser()
         random_specs$data <- my_dataset %>%
           select(species_german) %>%
           unique() %>%
@@ -146,15 +147,13 @@ mod_shroom_img_quiz_ui <- function(id) {
         if (values$feedback == "Richtig! Weiter zum nächsten Bild." || values$feedback == paste("Oooh da musch aber übe. Des isch der", values$current_species)) {
           # Rotate to the next species in a cyclic manner
           # next_index <- match(values$current_species, unique_species_german) %% length(unique_species_german) + 1
-          next_index <- sample(1:length(unique(my_dataset$species_german)), 1)
-          values$current_species <- unique_species_german[next_index]
 
-          if (values$feedback == "Richtig! Weiter zum nächsten Bild.") {
+          if (values$feedback == paste("Oooh da musch aber übe. Des isch der", values$current_species)) {
             # browser()
             shinyalert(
-              title = "Oooh do hat aber ena was glernt! Richtig!",
+              title = paste("Oooh da musch aber noch übe. Des isch der/ die", values$current_species),
               size = "xs",
-              closeOnClickOutside = FALSE,
+              closeOnClickOutside = TRUE,
               html = FALSE,
               type = "success",
               showConfirmButton = TRUE,
@@ -164,6 +163,25 @@ mod_shroom_img_quiz_ui <- function(id) {
             )
           }
 
+          if (values$feedback == "Richtig! Weiter zum nächsten Bild.") {
+            # browser()
+            shinyalert(
+              title = "Oooh do hat aber ena was glernt! Richtig!",
+              size = "xs",
+              closeOnClickOutside = TRUE,
+              html = FALSE,
+              type = "success",
+              showConfirmButton = TRUE,
+              confirmButtonText = "OK",
+              confirmButtonCol = "#AEDEF4",
+              animation = TRUE
+            )
+          }
+
+          # next one
+          next_index <- sample(1:length(unique(my_dataset$species_german)), 1)
+          values$current_species <- unique_species_german[next_index]
+
           # Vakue ressten
           values$feedback <- ""
         }
@@ -172,7 +190,7 @@ mod_shroom_img_quiz_ui <- function(id) {
           shinyalert(
             title = "Nää, n anderer!",
             size = "xs",
-            closeOnClickOutside = FALSE,
+            closeOnClickOutside = TRUE,
             html = FALSE,
             type = "error",
             showConfirmButton = TRUE,
@@ -198,15 +216,20 @@ mod_shroom_img_quiz_ui <- function(id) {
         # Filter images for the current species
         current_images <- my_dataset %>%
           filter(species_german == current_species_german) %>%
-          pull(local_path)
+          # pull(local_path)
+          pull(media_url)
 
-        # Encode each image to base64, handle if there are fewer than 3 images
-        encoded_images <- lapply(current_images, function(img_path) {
-          paste0("data:image/jpeg;base64,", base64encode(img_path))
-        })
+        # # Encode each image to base64, handle if there are fewer than 3 images
+        # encoded_images <- lapply(current_images, function(img_path) {
+        #   paste0("data:image/jpeg;base64,", base64encode(img_path))
+        # })
+
+        # Encode and resize each image
+        encoded_images <- lapply(current_images, encode_resized_image_from_url)
 
         # Dynamically create a tabPanel for each available image
         image_tabs <- lapply(seq_along(encoded_images), function(i) {
+          # tabPanel(paste("Bild", i), tags$img(src = encoded_images[[i]], height = "auto", width = "100%", style = "border-radius: 10px;"))
           tabPanel(paste("Bild", i), tags$img(src = encoded_images[[i]], height = "auto", width = "100%", style = "border-radius: 10px;"))
         })
 
@@ -214,14 +237,12 @@ mod_shroom_img_quiz_ui <- function(id) {
         do.call(tabsetPanel, image_tabs)
       })
 
-
-
     })
   }
 
 
 ## To be copied in the UI
-# mod_shroom_img_quiz_ui("shroom_img_quiz_1")
+# mod_shroom_img_quiz2_ui("shroom_img_quiz_1")
 
 ## To be copied in the server
-# mod_shroom_img_quiz_server("shroom_img_quiz_1")
+# mod_shroom_img_quiz2_server("shroom_img_quiz_1")

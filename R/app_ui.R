@@ -7,6 +7,9 @@
 #' @noRd
 app_ui <- function(request) {
   tagList(
+    # Add the app version text here
+    tags$div(style = "position: fixed; bottom: 10px; left: 10px; font-size: 12px; font-style: italic;",
+             paste("version", utils::packageVersion("pilzLernAppGolem"))),
     # Leave this function for adding external resources
     golem_add_external_resources(),
     # Your application UI logic
@@ -15,7 +18,9 @@ app_ui <- function(request) {
       # Adding tabsetPanel to switch between different modules
     nav_panel(
         "Mushroom Quiz",
-          mod_shroom_img_quiz_ui("shroom_img_quiz_1")),  # Tab for the quiz
+          # mod_shroom_img_quiz_ui("shroom_img_quiz_1")  # Tab for the quiz
+          mod_shroom_img_quiz2_ui("shroom_img_quiz_1")
+        ),
     nav_panel(
       "Species Gallery",
       mod_species_gallery_ui("species_gallery_1"))  # Tab for the image gallery
@@ -39,7 +44,7 @@ golem_add_external_resources <- function() {
   )
 
   tags$head(
-    favicon(),
+    favicon(ext = 'png'),
     bundle_resources(
       path = app_sys("app/www"),
       app_title = "pilzLernAppGolem"

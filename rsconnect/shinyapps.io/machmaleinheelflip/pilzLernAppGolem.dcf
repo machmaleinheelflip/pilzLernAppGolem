@@ -5,8 +5,9 @@ account: machmaleinheelflip
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 13210925
-bundleId: 9305440
+bundleId: 9309484
 url: https://machmaleinheelflip.shinyapps.io/pilzLernAppGolem/
 version: 1
 asMultiple: FALSE
 asStatic: FALSE
+ignoredFiles: R_archive/dataScraping3.R|R_archive/dataScraping4.R|R_archive/german_common_names.R|R_archive/taxtadb_test.R
