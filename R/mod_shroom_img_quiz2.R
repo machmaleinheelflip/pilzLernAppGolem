@@ -37,21 +37,21 @@ mod_shroom_img_quiz2_ui <- function(id) {
     moduleServer(id, function(input, output, session) {
       ns <- session$ns
 
-      my_dataset <- my_dataset %>%
+      shrooms <- shrooms %>%
         filter(!is.na(species_german))
 
-      # generate randomized integer between 1 and length(unique(my_dataset$species_german)
-      random_species_number <- sample(1:length(unique(my_dataset$species_german)), 1)
+      # generate randomized integer between 1 and length(unique(shrooms$species_german)
+      random_species_number <- sample(1:length(unique(shrooms$species_german)), 1)
 
       # browser()
-      unique_species_german <- unique(my_dataset$species_german)  # Assuming this is your species list
+      unique_species_german <- unique(shrooms$species_german)  # Assuming this is your species list
       values <- reactiveValues(current_species = unique_species_german[random_species_number])
       random_specs <- reactiveValues(data=NULL)
 
       observe({
         req(values$current_species)
         # browser()
-        random_specs$data <- my_dataset %>%
+        random_specs$data <- shrooms %>%
           select(species_german) %>%
           unique() %>%
           slice_sample(n=3) %>%
@@ -179,7 +179,7 @@ mod_shroom_img_quiz2_ui <- function(id) {
           }
 
           # next one
-          next_index <- sample(1:length(unique(my_dataset$species_german)), 1)
+          next_index <- sample(1:length(unique(shrooms$species_german)), 1)
           values$current_species <- unique_species_german[next_index]
 
           # Vakue ressten
@@ -214,7 +214,7 @@ mod_shroom_img_quiz2_ui <- function(id) {
         current_species_german <- values$current_species
 
         # Filter images for the current species
-        current_images <- my_dataset %>%
+        current_images <- shrooms %>%
           filter(species_german == current_species_german) %>%
           # pull(local_path)
           pull(media_url)

@@ -37,20 +37,20 @@ mod_shroom_img_quiz_ui <- function(id) {
     moduleServer(id, function(input, output, session) {
       ns <- session$ns
 
-      my_dataset <- my_dataset %>%
+      shrooms <- shrooms %>%
         filter(!is.na(species_german))
 
-      # generate randomized integer between 1 and length(unique(my_dataset$species_german)
-      random_species_number <- sample(1:length(unique(my_dataset$species_german)), 1)
+      # generate randomized integer between 1 and length(unique(shrooms$species_german)
+      random_species_number <- sample(1:length(unique(shrooms$species_german)), 1)
 
       # browser()
-      unique_species_german <- unique(my_dataset$species_german)  # Assuming this is your species list
+      unique_species_german <- unique(shrooms$species_german)  # Assuming this is your species list
       values <- reactiveValues(current_species = unique_species_german[random_species_number])
       random_specs <- reactiveValues(data=NULL)
 
       observe({
         req(values$current_species)
-        random_specs$data <- my_dataset %>%
+        random_specs$data <- shrooms %>%
           select(species_german) %>%
           unique() %>%
           slice_sample(n=3) %>%
@@ -146,7 +146,7 @@ mod_shroom_img_quiz_ui <- function(id) {
         if (values$feedback == "Richtig! Weiter zum nächsten Bild." || values$feedback == paste("Oooh da musch aber übe. Des isch der", values$current_species)) {
           # Rotate to the next species in a cyclic manner
           # next_index <- match(values$current_species, unique_species_german) %% length(unique_species_german) + 1
-          next_index <- sample(1:length(unique(my_dataset$species_german)), 1)
+          next_index <- sample(1:length(unique(shrooms$species_german)), 1)
           values$current_species <- unique_species_german[next_index]
 
           if (values$feedback == "Richtig! Weiter zum nächsten Bild.") {
@@ -196,7 +196,7 @@ mod_shroom_img_quiz_ui <- function(id) {
         current_species_german <- values$current_species
 
         # Filter images for the current species
-        current_images <- my_dataset %>%
+        current_images <- shrooms %>%
           filter(species_german == current_species_german) %>%
           pull(local_path)
 

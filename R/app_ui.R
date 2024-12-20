@@ -16,15 +16,20 @@ app_ui <- function(request) {
     page_navbar(
       title = "Mushroom Learning",
       # Adding tabsetPanel to switch between different modules
-    nav_panel(
-        "Mushroom Quiz",
-          # mod_shroom_img_quiz_ui("shroom_img_quiz_1")  # Tab for the quiz
-          mod_shroom_img_quiz2_ui("shroom_img_quiz_1")
+      nav_panel(
+          "Mushroom Quiz",
+            # mod_shroom_img_quiz_ui("shroom_img_quiz_1")  # Tab for the quiz
+            mod_shroom_img_quiz2_ui("shroom_img_quiz_1")
+          ),
+      nav_panel(
+        "Species Gallery",
+        mod_species_gallery_ui("species_gallery_1") # Tab for the image gallery
         ),
-    nav_panel(
-      "Species Gallery",
-      mod_species_gallery_ui("species_gallery_1"))  # Tab for the image gallery
+      nav_panel(
+        "German Spec Quiz",
+        mod_plants_img_quiz_ui("plants_img_quiz_1")
       )
+    )
   )
 }
 
