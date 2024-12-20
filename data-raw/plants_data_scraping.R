@@ -168,3 +168,17 @@ pbapply::pblapply(species_list$speciesKey[1640:4064], process_species)
 
 plants <- readRDS("data-raw/plants_1.rds")
 usethis::use_data(plants, overwrite = TRUE)
+
+
+
+
+
+# data saving specific ----
+# --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
+
+data <- readRDS("data-raw/plants_1.rds")
+# filter for hymenoptera
+hymenoptera <- data %>%
+  filter(order=="Hymenoptera")
+
+usethis::use_data(hymenoptera, overwrite = TRUE)

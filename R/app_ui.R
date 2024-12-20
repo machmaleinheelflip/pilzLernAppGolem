@@ -28,6 +28,10 @@ app_ui <- function(request) {
       nav_panel(
         "German Spec Quiz",
         mod_plants_img_quiz_ui("plants_img_quiz_1")
+      ),
+      nav_panel(
+        "Hymenoptera Quiz",
+        mod_hymenoptera_img_quiz_ui("hymenoptera_img_quiz_1")
       )
     )
   )

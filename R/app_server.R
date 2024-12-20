@@ -11,4 +11,6 @@ app_server <- function(input, output, session) {
   # mod_species_gallery_server("species_gallery_1")
 
   mod_plants_img_quiz_server("plants_img_quiz_1")
+
+  mod_hymenoptera_img_quiz_server("hymenoptera_img_quiz_1")
 }
