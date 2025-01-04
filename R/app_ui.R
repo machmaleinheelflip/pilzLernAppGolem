@@ -10,6 +10,9 @@ app_ui <- function(request) {
     # Add the app version text here
     tags$div(style = "position: fixed; bottom: 10px; left: 10px; font-size: 12px; font-style: italic;",
              paste("version", utils::packageVersion("pilzLernAppGolem"))),
+    # Add licence n stuff
+    tags$div(style = "position: fixed; bottom: 10px; right: 10px; font-size: 12px; font-style: italic;",
+             mod_licence_n_faq_ui("licence_n_faq_1")),
     # Leave this function for adding external resources
     golem_add_external_resources(),
     # Your application UI logic
