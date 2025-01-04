@@ -19,7 +19,7 @@ mod_plants_img_quiz_ui <- function(id) {
         max_height = "275px",
         reactableOutput(ns("species_table")),  # Table for selecting species
         # textOutput(ns("feedback")),
-        actionButton(ns("show_solution"), "Isch wes et net")
+        actionButton(ns("show_solution"), "Ich weis es nicht.")
       )
     )
 
@@ -103,7 +103,7 @@ mod_plants_img_quiz_server <- function(id){
 
     # show_solution_react <- reactiveVal(0)
     observeEvent(input$show_solution, {
-      values$feedback <- paste("Oooh da musch aber übe. Des isch der", values$current_species)
+      values$feedback <- paste("Lösung: ", values$current_species)
 
       # Deselect selected
       updateReactable(outputId = "species_table",
@@ -140,14 +140,14 @@ mod_plants_img_quiz_server <- function(id){
 
     # Suppose you have a method to change the current species when correct
     observeEvent(values$feedback, {
-      if (values$feedback == "Richtig! Weiter zum nächsten Bild." || values$feedback == paste("Oooh da musch aber übe. Des isch der", values$current_species)) {
+      if (values$feedback == "Richtig! Weiter zum nächsten Bild." || values$feedback == paste("Lösung: ", values$current_species)) {
         # Rotate to the next species in a cyclic manner
         # next_index <- match(values$current_species, unique_species_german) %% length(unique_species_german) + 1
 
-        if (values$feedback == paste("Oooh da musch aber übe. Des isch der", values$current_species)) {
+        if (values$feedback == paste("Lösung: ", values$current_species)) {
           # browser()
           shinyalert(
-            title = paste("Oooh da musch aber noch übe. Des isch der/ die", values$current_species),
+            title = paste("Lösung: ", values$current_species),
             size = "xs",
             closeOnClickOutside = TRUE,
             html = FALSE,
@@ -162,7 +162,7 @@ mod_plants_img_quiz_server <- function(id){
         if (values$feedback == "Richtig! Weiter zum nächsten Bild.") {
           # browser()
           shinyalert(
-            title = "Oooh do hat aber ena was glernt! Richtig!",
+            title = "Richtig! :)",
             size = "xs",
             closeOnClickOutside = TRUE,
             html = FALSE,
@@ -184,7 +184,7 @@ mod_plants_img_quiz_server <- function(id){
 
       if (values$feedback == "Falsch. Bitte erneut versuchen.") {
         shinyalert(
-          title = "Nää, n anderer!",
+          title = "Leider falsch :(",
           size = "xs",
           closeOnClickOutside = TRUE,
           html = FALSE,

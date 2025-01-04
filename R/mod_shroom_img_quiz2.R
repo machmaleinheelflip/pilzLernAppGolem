@@ -17,13 +17,13 @@ mod_shroom_img_quiz2_ui <- function(id) {
     layout_columns(
       col_widths = c(4, 8),
       card(
-        uiOutput(ns("mushroom_images"))  # Display images in tabs for each species
+        uiOutput(ns("shroom_images"))  # Display images in tabs for each species
       ),
       card(
         max_height = "275px",
         reactableOutput(ns("species_table")),  # Table for selecting species
         # textOutput(ns("feedback")),
-        actionButton(ns("show_solution"), "Isch wes et net")
+        actionButton(ns("show_solution"), "Ich weis es nicht.")
       )
     )
   )
@@ -100,14 +100,14 @@ mod_shroom_img_quiz2_ui <- function(id) {
                                     # cell = function(value) {
                                     #   htmltools::tags$div(style = "cursor: pointer;", value)
                                     #   }
-                             )
-        ))
+            )
+          ))
       })
 
 
       # show_solution_react <- reactiveVal(0)
       observeEvent(input$show_solution, {
-        values$feedback <- paste("Oooh da musch aber übe. Des isch der", values$current_species)
+        values$feedback <- paste("Lösung: ", values$current_species)
 
         # Deselect selected
         updateReactable(outputId = "species_table",
@@ -144,14 +144,14 @@ mod_shroom_img_quiz2_ui <- function(id) {
 
       # Suppose you have a method to change the current species when correct
       observeEvent(values$feedback, {
-        if (values$feedback == "Richtig! Weiter zum nächsten Bild." || values$feedback == paste("Oooh da musch aber übe. Des isch der", values$current_species)) {
+        if (values$feedback == "Richtig! Weiter zum nächsten Bild." || values$feedback == paste("Lösung: ", values$current_species)) {
           # Rotate to the next species in a cyclic manner
           # next_index <- match(values$current_species, unique_species_german) %% length(unique_species_german) + 1
 
-          if (values$feedback == paste("Oooh da musch aber übe. Des isch der", values$current_species)) {
+          if (values$feedback == paste("Lösung: ", values$current_species)) {
             # browser()
             shinyalert(
-              title = paste("Oooh da musch aber noch übe. Des isch der/ die", values$current_species),
+              title = paste("Lösung: ", values$current_species),
               size = "xs",
               closeOnClickOutside = TRUE,
               html = FALSE,
@@ -166,7 +166,7 @@ mod_shroom_img_quiz2_ui <- function(id) {
           if (values$feedback == "Richtig! Weiter zum nächsten Bild.") {
             # browser()
             shinyalert(
-              title = "Oooh do hat aber ena was glernt! Richtig!",
+              title = "Richtig! :)",
               size = "xs",
               closeOnClickOutside = TRUE,
               html = FALSE,
@@ -188,7 +188,7 @@ mod_shroom_img_quiz2_ui <- function(id) {
 
         if (values$feedback == "Falsch. Bitte erneut versuchen.") {
           shinyalert(
-            title = "Nää, n anderer!",
+            title = "Leider falsch :(",
             size = "xs",
             closeOnClickOutside = TRUE,
             html = FALSE,
@@ -208,7 +208,7 @@ mod_shroom_img_quiz2_ui <- function(id) {
 
 
       # Render images for the current species in separate tabs, encoding them to base64
-      output$mushroom_images <- renderUI({
+      output$shroom_images <- renderUI({
         # browser()
         # Get the current species German name
         current_species_german <- values$current_species

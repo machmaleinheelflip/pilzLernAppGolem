@@ -130,7 +130,9 @@ process_species <- function(speciesKey) {
 # species_list from a gbif dataset ----
 # --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 species_list <- read.delim2("data-raw/iNaturalistResearchGradeObs_Germany_all.csv") %>% select(speciesKey) %>% unique() %>% filter(!is.na(speciesKey)) # %>% arrange(speciesKey)
-
+species_list$row_number <- 1:nrow(species_list)
+# sort row numbers descending
+species_list <- species_list[order(species_list$row_number, decreasing = TRUE),]
 
 # apply function to species_list ----
 # --- --- --- --- --- --- --- --- --- --- --- --- --- ---
