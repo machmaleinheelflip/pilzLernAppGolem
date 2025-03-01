@@ -4,9 +4,11 @@
 #'     DO NOT REMOVE.
 #' @import shiny
 #' @import bslib
+#' @import shinyjs
 #' @noRd
 app_ui <- function(request) {
   tagList(
+    useShinyjs(), # Initialize shinyjs
     # Add the app version text here
     tags$div(style = "position: fixed; bottom: 10px; left: 10px; font-size: 12px; font-style: italic;",
              paste("version", utils::packageVersion("pilzLernAppGolem"))),
@@ -17,7 +19,9 @@ app_ui <- function(request) {
     golem_add_external_resources(),
     # Your application UI logic
     page_navbar(
-      title = "Mushroom Learning",
+      id = "navbar",
+    # navset_tab(
+      # title = "Mushroom Learning",
       # Adding tabsetPanel to switch between different modules
       nav_panel(
         "Welcome",
@@ -25,7 +29,8 @@ app_ui <- function(request) {
         mod_welcome_ui("welcome_1")
       ),
       nav_panel(
-          "Mushroom Quiz",
+        # id= "MushroomQuiz",
+          "MushroomQuiz",
             # mod_shroom_img_quiz_ui("shroom_img_quiz_1")  # Tab for the quiz
             mod_shroom_img_quiz2_ui("shroom_img_quiz_1")
           ),

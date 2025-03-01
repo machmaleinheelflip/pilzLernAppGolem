@@ -181,7 +181,8 @@ mod_shroom_img_quiz2_ui <- function(id) {
 
           # next one
           next_index <- sample(1:length(unique(shrooms$species_german)), 1)
-          values$current_species <- unique_species_german[next_index]
+          values$current_species <- shrooms$species_german[next_index]
+          # reactiveValues(current_species = shrooms$species_german[random_species_number], species= shrooms$species[random_species_number])
 
           # Vakue ressten
           values$feedback <- ""

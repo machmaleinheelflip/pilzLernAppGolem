@@ -10,11 +10,13 @@
 #' @importFrom bslib bs_theme
 #' @importFrom shinyLP jumbotron
 #' @import shiny
-
+#' @import shinyjs
 mod_welcome_ui <- function(id){
   ns <- NS(id)
 
   tagList(
+    shinyjs::useShinyjs(),
+
     # Meta tags for SEO
     tags$head(
       tags$title("Species Identification Quiz - Test Your Knowledge!"),
@@ -42,21 +44,28 @@ mod_welcome_ui <- function(id){
           column(
             width = 4,
             div(class = "feature-box",
-                tags$h3("Identify Mushrooms"),
+                # tags$h3("Identify Mushrooms"),
+                actionLink(ns("navPanelShrooms"), "Identify Mushrooms",
+                           style = "font-size: 24px; font-weight: bold; text-decoration: none; cursor: pointer;"),
+
                 tags$p("Can you recognize different fungi? Improve your knowledge with this interactive quiz.")
             )
           ),
           column(
             width = 4,
             div(class = "feature-box",
-                tags$h3("Learn About Plants"),
+                # tags$h3("Learn About Plants"),
+                actionLink(ns("navPanelPlants"), "Learn About Plants",
+                           style = "font-size: 24px; font-weight: bold; text-decoration: none; cursor: pointer;"),
                 tags$p("Test your botany skills by identifying different plant species.")
             )
           ),
           column(
             width = 4,
             div(class = "feature-box",
-                tags$h3("Recognize Bees"),
+                # tags$h3("Recognize Bees"),
+                actionLink(ns("navPanelBees"), "Recognize Bees",
+                           style = "font-size: 24px; font-weight: bold; text-decoration: none; cursor: pointer;"),
                 tags$p("Discover how to differentiate various bee species.") # and understand their roles in nature.
             )
           )
@@ -82,7 +91,11 @@ mod_welcome_ui <- function(id){
           )
         ),
 
-        br(),br(),
+        br(),
+
+        mod_licence_n_faq_ui("licence_n_faq_1"),
+
+        br(), br(),
 
         # Footer
         fluidRow(
@@ -90,9 +103,7 @@ mod_welcome_ui <- function(id){
             width = 12,
             tags$footer("2025 Species Quiz - Made with ❤️ by machmaleinheelflip", class = "footer")
           )
-        ),
-
-        mod_licence_n_faq_ui("licence_n_faq_1")
+        )
 
       )
     # )
@@ -106,9 +117,25 @@ mod_welcome_server <- function(id){
   moduleServer(id, function(input, output, session){
     ns <- session$ns
 
+    observeEvent(input$navPanelShrooms, {
+      # browser()
+      shinyjs::runjs("$('li.nav-item:nth-child(2) > a:nth-child(1)').click();")
+    })
+
+    observeEvent(input$navPanelPlants, {
+      # browser()
+      shinyjs::runjs("$('li.nav-item:nth-child(3) > a:nth-child(1)').click();")
+    })
+
+    observeEvent(input$navPanelBees, {
+      # browser()
+      shinyjs::runjs("$('li.nav-item:nth-child(4) > a:nth-child(1)').click();")
+    })
+
 
   })
 }
+
 
 ## To be copied in the UI
 # mod_welcome_ui("welcome_1")

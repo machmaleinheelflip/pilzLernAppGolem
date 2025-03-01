@@ -177,7 +177,7 @@ mod_plants_img_quiz_server <- function(id){
 
         # next one
         next_index <- sample(1:length(unique(plants$species_german)), 1)
-        values$current_species <- unique_species_german[next_index]
+        values$current_species <- plants$species_german[next_index]
 
         # Vakue ressten
         values$feedback <- ""
