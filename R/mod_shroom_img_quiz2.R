@@ -44,18 +44,18 @@ mod_shroom_img_quiz2_ui <- function(id) {
       random_species_number <- sample(1:length(unique(shrooms$species_german)), 1)
 
       # browser()
-      unique_species_german <- unique(shrooms$species_german)  # Assuming this is your species list
-      values <- reactiveValues(current_species = unique_species_german[random_species_number])
+      # unique_species_german <- unique(shrooms$species_german) # Assuming this is your species list
+      values <- reactiveValues(current_species = shrooms$species_german[random_species_number], species= shrooms$species[random_species_number])
       random_specs <- reactiveValues(data=NULL)
 
       observe({
         req(values$current_species)
         # browser()
         random_specs$data <- shrooms %>%
-          select(species_german) %>%
+          select(species_german, species) %>%
           unique() %>%
           slice_sample(n=3) %>%
-          bind_rows(data.frame(species_german= values$current_species)) %>%
+          bind_rows(data.frame(species_german= values$current_species, species=values$species)) %>%
           unique() %>%
           mutate(random_sorting= sample(1:nrow(.), nrow(.))) %>%
           arrange(random_sorting) %>%
@@ -96,11 +96,12 @@ mod_shroom_img_quiz2_ui <- function(id) {
           defaultSelected = NULL,
           columns = list(
             .selection = colDef(show = FALSE),
-            species_german = colDef(name = "Species",
+            species_german = colDef(name = "Art (Deutsch)",
                                     # cell = function(value) {
                                     #   htmltools::tags$div(style = "cursor: pointer;", value)
                                     #   }
-            )
+            ),
+            species = colDef(name = "Scientific Name")
           ))
       })
 

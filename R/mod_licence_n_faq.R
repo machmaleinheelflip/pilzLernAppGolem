@@ -10,7 +10,8 @@
 mod_licence_n_faq_ui <- function(id) {
   ns <- NS(id)
   tagList(
-    actionButton(ns("show_licence"), "Data source, licence and citation"),
+    # actionButton(ns("show_licence"), "Data source, licence and citation"),
+    htmlOutput(ns("licence"))
    )
 }
 
@@ -29,20 +30,24 @@ mod_licence_n_faq_server <- function(id){
       HTML("<span><b>  Citation:  </b> iNaturalist contributors, iNaturalist (2024). iNaturalist Research-grade Observations. iNaturalist.org. Occurrence dataset https://doi.org/10.15468/ab3s5x accessed via GBIF.org on 2025-01-04. </span>")
     )
 
-    observeEvent(input$show_licence, {
-      shinyalert(
-        title = "Data source, licence and citation",
-        text = text,
-        size = "xs",
-        closeOnClickOutside = TRUE,
-        html = TRUE,
-        type = "info",
-        showConfirmButton = TRUE,
-        confirmButtonText = "OK",
-        confirmButtonCol = "#AEDEF4",
-        animation = TRUE
-      )
+    output$licence <- renderUI({
+      text
     })
+
+    # observeEvent(input$show_licence, {
+    #   shinyalert(
+    #     title = "Data source, licence and citation",
+    #     text = text,
+    #     size = "xs",
+    #     closeOnClickOutside = TRUE,
+    #     html = TRUE,
+    #     type = "info",
+    #     showConfirmButton = TRUE,
+    #     confirmButtonText = "OK",
+    #     confirmButtonCol = "#AEDEF4",
+    #     animation = TRUE
+    #   )
+    # })
 
   })
 }

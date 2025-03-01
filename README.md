@@ -17,3 +17,11 @@
 -   bilder evtl in irgendeine cloud und dann per weblink abrufen und rendern! da nur 1gb shinyio ODER bei shiny io schaune, ob man es vergrösern kann
 
 -   wenn flasch kommt pup up nur einmal
+
+## 18.01.25
+
+-   Artengruppen spielmodi: e.g. rübling, helmling, ritterling, trichterling etc. dann abgleichen mit vorgeschlagenen arten
+
+-   langing page mit stats über arten gruppen, e.g. 1250 pilzarten, 500 bienen, ... dann auch per button auswählen welche artgruppe man üben möchte
+
+-   level 2 vlt sowas wie dass man vorgeschlagene arten von selber gattung nimmt, level 1 eher selbe fam

@@ -11,8 +11,8 @@ app_ui <- function(request) {
     tags$div(style = "position: fixed; bottom: 10px; left: 10px; font-size: 12px; font-style: italic;",
              paste("version", utils::packageVersion("pilzLernAppGolem"))),
     # Add licence n stuff
-    tags$div(style = "position: fixed; bottom: 10px; right: 10px; font-size: 12px; font-style: italic;",
-             mod_licence_n_faq_ui("licence_n_faq_1")),
+    # tags$div(style = "position: fixed; bottom: 10px; right: 10px; font-size: 12px; font-style: italic;",
+    #          mod_licence_n_faq_ui("licence_n_faq_1")),
     # Leave this function for adding external resources
     golem_add_external_resources(),
     # Your application UI logic
@@ -24,10 +24,10 @@ app_ui <- function(request) {
             # mod_shroom_img_quiz_ui("shroom_img_quiz_1")  # Tab for the quiz
             mod_shroom_img_quiz2_ui("shroom_img_quiz_1")
           ),
-      nav_panel(
-        "Species Gallery",
-        mod_species_gallery_ui("species_gallery_1") # Tab for the image gallery
-        ),
+      # nav_panel(
+      #   "Species Gallery",
+      #   mod_species_gallery_ui("species_gallery_1") # Tab for the image gallery
+      #   ),
       nav_panel(
         "German Spec Quiz",
         mod_plants_img_quiz_ui("plants_img_quiz_1")
@@ -35,6 +35,10 @@ app_ui <- function(request) {
       nav_panel(
         "Hymenoptera Quiz",
         mod_hymenoptera_img_quiz_ui("hymenoptera_img_quiz_1")
+      ),
+      nav_panel(
+        "Data source, licence and citation",
+        mod_licence_n_faq_ui("licence_n_faq_1")
       )
     )
   )
