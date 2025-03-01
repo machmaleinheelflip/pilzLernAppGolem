@@ -20,6 +20,11 @@ app_ui <- function(request) {
       title = "Mushroom Learning",
       # Adding tabsetPanel to switch between different modules
       nav_panel(
+        "Welcome",
+        # mod_shroom_img_quiz_ui("shroom_img_quiz_1")  # Tab for the quiz
+        mod_welcome_ui("welcome_1")
+      ),
+      nav_panel(
           "Mushroom Quiz",
             # mod_shroom_img_quiz_ui("shroom_img_quiz_1")  # Tab for the quiz
             mod_shroom_img_quiz2_ui("shroom_img_quiz_1")
@@ -35,11 +40,11 @@ app_ui <- function(request) {
       nav_panel(
         "Hymenoptera Quiz",
         mod_hymenoptera_img_quiz_ui("hymenoptera_img_quiz_1")
-      ),
-      nav_panel(
-        "Data source, licence and citation",
-        mod_licence_n_faq_ui("licence_n_faq_1")
       )
+      # nav_panel(
+      #   "Data source, licence and citation",
+      #   mod_licence_n_faq_ui("licence_n_faq_1")
+      # )
     )
   )
 }
