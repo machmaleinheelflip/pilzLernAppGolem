@@ -16,7 +16,7 @@ mod_hymenoptera_img_quiz_ui <- function(id) {
         uiOutput(ns("plant_images"))  # Display images in tabs for each species
       ),
       card(
-        max_height = "275px",
+        max_height = "375px",
         reactableOutput(ns("species_table")),  # Table for selecting species
         # textOutput(ns("feedback")),
         actionButton(ns("show_solution"), "Ich weiß nicht!")
@@ -179,6 +179,7 @@ mod_hymenoptera_img_quiz_server <- function(id){
         # next one
         next_index <- sample(1:length(unique(hymenoptera$species_german)), 1)
         values$current_species <- hymenoptera$species_german[next_index]
+        values$species <- hymenoptera$species[next_index]
 
         # Vakue ressten
         values$feedback <- ""

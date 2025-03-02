@@ -20,7 +20,7 @@ mod_shroom_img_quiz2_ui <- function(id) {
         uiOutput(ns("shroom_images"))  # Display images in tabs for each species
       ),
       card(
-        max_height = "275px",
+        max_height = "375px",
         reactableOutput(ns("species_table")),  # Table for selecting species
         # textOutput(ns("feedback")),
         actionButton(ns("show_solution"), "Ich weis es nicht.")
@@ -182,7 +182,7 @@ mod_shroom_img_quiz2_ui <- function(id) {
           # next one
           next_index <- sample(1:length(unique(shrooms$species_german)), 1)
           values$current_species <- shrooms$species_german[next_index]
-          # reactiveValues(current_species = shrooms$species_german[random_species_number], species= shrooms$species[random_species_number])
+          values$species <- shrooms$species[next_index]
 
           # Vakue ressten
           values$feedback <- ""
