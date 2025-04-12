@@ -8,11 +8,14 @@ shroomGroups <- read_excel("data-raw/Lamellenpilze_Habitustypen_n_Merkmale.xlsx"
   distinct() %>% filter(!is.na(genus))
 # TODO ansscheinind sind manche gattungen in mehreren gruppen, versuche diese zu finden und versuche herauszufinden, wie sie Björn einordnet!
 
+# find doublets of genus
+# doublets <- shroomGroups %>%
+#   group_by(genus) %>%
+#   filter(n() > 1) %>%
+#   ungroup() %>%
+#   arrange(genus)
+
 usethis::use_data(shroomGroups, overwrite = TRUE)
-
-shrooms_extended <- shrooms %>%
-  left_join(Lamellenpilze_Habitustypen_n_Merkmale, by = c("genus" = "Gattung_sci"), relationship = "one-to-many")
-
 
 ## checks
 # nonMatching <- shrooms_extended %>%
@@ -21,3 +24,9 @@ shrooms_extended <- shrooms %>%
 # matching <- shrooms_extended %>%
 #   select(genus, key1) %>% filter(!is.na(key1)) %>% pull(genus) %>% unique() %>% sort() %>% as.character()
 # matching
+
+library(readxl)
+shroomHabitus <- read_excel("data-raw/Lamellenpilze_Habitustypen_n_Merkmale.xlsx",
+                           sheet = "Habitustypen")
+
+usethis::use_data(shroomHabitus, overwrite = TRUE)

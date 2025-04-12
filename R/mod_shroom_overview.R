@@ -34,8 +34,8 @@ mod_shroom_overview_server <- function(id) {
     output$quiz_ui <- renderUI({
       switch(input$level_selector,
         "Classic" = mod_shroom_img_quiz_ui("shroom_img_quiz_1"),
-        "Level 1" = mod_shroom_img_quiz_level_1_ui("shroom_img_quiz_level_1_1")
-        # "Level 2" = mod_shroom_img_quiz_ui("shroom_img_quiz_2"),
+        "Level 1" = mod_shroom_img_quiz_level_1_ui("shroom_img_quiz_level_1_1"),
+        "Level 2" = mod_shroom_img_quiz_level_2_ui("shroom_img_quiz_level_2_1")
         # "Level 3" = mod_shroom_img_quiz_ui("shroom_img_quiz_3"),
         # "Level 4" = mod_shroom_img_quiz_ui("shroom_img_quiz_4")
       )
