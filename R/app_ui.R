@@ -32,7 +32,7 @@ app_ui <- function(request) {
         # id= "MushroomQuiz",
           "MushroomQuiz",
             # mod_shroom_img_quiz_ui("shroom_img_quiz_1")  # Tab for the quiz
-            mod_shroom_img_quiz2_ui("shroom_img_quiz_1")
+            mod_shroom_img_quiz_ui("shroom_img_quiz_1")
           ),
       # nav_panel(
       #   "Species Gallery",
