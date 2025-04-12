@@ -11,7 +11,7 @@
 #' @import base64enc
 #' @import reactable
 #' @import shinyalert
-mod_shroom_img_quiz_ui <- function(id) {
+mod_shroom_img_quiz_level_1_ui <- function(id) {
   ns <- NS(id)
   tagList(
     layout_columns(
@@ -33,40 +33,33 @@ mod_shroom_img_quiz_ui <- function(id) {
 #' shroom_img_quiz Server Functions
 #'
 #' @noRd
-mod_shroom_img_quiz_server <- function(id) {
+mod_shroom_img_quiz_level_1_server <- function(id) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
-    # browser()
     shrooms <- shrooms %>%
-      filter(!is.na(species_german))
+      filter(!is.na(species_german)) %>%
+      left_join(shroomGroups, relationship = "many-to-one") %>%
+      filter(!is.na(key1))
 
-    # generate randomized integer between 1 and length(unique(shrooms$species_german)
     random_species_number <- sample(1:length(unique(shrooms$species_german)), 1)
-
-    # browser()
-    # unique_species_german <- unique(shrooms$species_german) # Assuming this is your species list
-    values <- reactiveValues(current_species = shrooms$species_german[random_species_number], species = shrooms$species[random_species_number])
+    values <- reactiveValues(
+      current_species = shrooms$species_german[random_species_number],
+      species = shrooms$species[random_species_number],
+      key1 = shrooms$key1[random_species_number]
+    )
     random_specs <- reactiveValues(data = NULL)
 
     observe({
       req(values$current_species)
-      # browser()
       random_specs$data <- shrooms %>%
-        select(species_german, species) %>%
+        select(key1) %>%
         unique() %>%
-        slice_sample(n = 3) %>%
-        bind_rows(data.frame(species_german = values$current_species, species = values$species)) %>%
-        unique() %>%
-        mutate(random_sorting = sample(1:nrow(.), nrow(.))) %>%
-        arrange(random_sorting) %>%
-        select(-random_sorting)
+        arrange(key1)
     })
 
-    # Setup reactable table
     output$species_table <- renderReactable({
       req(values$current_species)
-      # browser()
 
       reactable(
         data = random_specs$data,
@@ -85,35 +78,17 @@ mod_shroom_img_quiz_server <- function(id) {
         showSortable = TRUE,
         defaultColDef = colDef(
           defaultSortOrder = "desc",
-          align = "left",
-          cell = reactablefmtr::data_bars(
-            data = .,
-            fill_color = viridis::mako(1000),
-            background = "#ffffff",
-            text_position = "outside-end",
-            number_fmt = scales::comma
-          )
+          align = "left"
         ),
         defaultSelected = NULL,
         columns = list(
-          .selection = colDef(show = FALSE),
-          species_german = colDef(
-            name = "Art (Deutsch)",
-            # cell = function(value) {
-            #   htmltools::tags$div(style = "cursor: pointer;", value)
-            #   }
-          ),
-          species = colDef(name = "Scientific Name")
+          key1 = colDef(name = "Gruppe")
         )
       )
     })
 
-
-    # show_solution_react <- reactiveVal(0)
     observeEvent(input$show_solution, {
-      values$feedback <- paste("Lösung: ", values$current_species)
-
-      # Deselect selected
+      values$feedback <- paste("Lösung: ", values$key1)
       updateReactable(
         outputId = "species_table",
         data = random_specs$data,
@@ -121,17 +96,13 @@ mod_shroom_img_quiz_server <- function(id) {
       )
     })
 
-
     selected_row_index <- reactive(reactable::getReactableState("species_table", "selected", session))
 
     observeEvent(selected_row_index(), {
-      # browser()
-      selected_species <- random_specs$data[selected_row_index(), "species_german"]
+      selected_key <- random_specs$data[selected_row_index(), "key1"]
 
-      if (selected_species == values$current_species) {
+      if (selected_key == values$key1) {
         values$feedback <- "Richtig! Weiter zum nächsten Bild."
-
-        # Deselect selected
         updateReactable(
           outputId = "species_table",
           data = random_specs$data,
@@ -139,7 +110,6 @@ mod_shroom_img_quiz_server <- function(id) {
         )
       } else {
         values$feedback <- "Falsch. Bitte erneut versuchen."
-        # Deselect selected
         updateReactable(
           outputId = "species_table",
           selected = NA
@@ -147,21 +117,15 @@ mod_shroom_img_quiz_server <- function(id) {
       }
     })
 
-    # Update feedback
     output$feedback <- renderText({
       values$feedback
     })
 
-    # Suppose you have a method to change the current species when correct
     observeEvent(values$feedback, {
-      if (values$feedback == "Richtig! Weiter zum nächsten Bild." || values$feedback == paste("Lösung: ", values$current_species)) {
-        # Rotate to the next species in a cyclic manner
-        # next_index <- match(values$current_species, unique_species_german) %% length(unique_species_german) + 1
-
-        if (values$feedback == paste("Lösung: ", values$current_species)) {
-          # browser()
+      if (values$feedback == "Richtig! Weiter zum nächsten Bild." || values$feedback == paste("Lösung: ", values$key1)) {
+        if (values$feedback == paste("Lösung: ", values$key1)) {
           shinyalert(
-            title = paste("Lösung: ", values$current_species),
+            title = paste("Lösung: ", values$key1),
             size = "xs",
             closeOnClickOutside = TRUE,
             html = FALSE,
@@ -174,7 +138,6 @@ mod_shroom_img_quiz_server <- function(id) {
         }
 
         if (values$feedback == "Richtig! Weiter zum nächsten Bild.") {
-          # browser()
           shinyalert(
             title = "Richtig! :)",
             size = "xs",
@@ -188,12 +151,13 @@ mod_shroom_img_quiz_server <- function(id) {
           )
         }
 
-        # next one
         next_index <- sample(1:length(unique(shrooms$species_german)), 1)
         values$current_species <- shrooms$species_german[next_index]
         values$species <- shrooms$species[next_index]
-
-        # Vakue ressten
+        values$key1 <- shrooms %>%
+          filter(species_german == values$current_species) %>%
+          pull(key1) %>%
+          first()
         values$feedback <- ""
       }
 
@@ -211,7 +175,6 @@ mod_shroom_img_quiz_server <- function(id) {
         )
       }
 
-      # Deselect selected
       updateReactable(
         outputId = "species_table",
         data = random_specs$data,
@@ -219,34 +182,18 @@ mod_shroom_img_quiz_server <- function(id) {
       )
     })
 
-
-    # Render images for the current species in separate tabs, encoding them to base64
     output$shroom_images <- renderUI({
-      # browser()
-      # Get the current species German name
       current_species_german <- values$current_species
-
-      # Filter images for the current species
       current_images <- shrooms %>%
         filter(species_german == current_species_german) %>%
-        # pull(local_path)
         pull(media_url)
 
-      # # Encode each image to base64, handle if there are fewer than 3 images
-      # encoded_images <- lapply(current_images, function(img_path) {
-      #   paste0("data:image/jpeg;base64,", base64encode(img_path))
-      # })
-
-      # Encode and resize each image
       encoded_images <- lapply(current_images, encode_resized_image_from_url)
 
-      # Dynamically create a tabPanel for each available image
       image_tabs <- lapply(seq_along(encoded_images), function(i) {
-        # tabPanel(paste("Bild", i), tags$img(src = encoded_images[[i]], height = "auto", width = "100%", style = "border-radius: 10px;"))
         tabPanel(paste("Bild", i), tags$img(src = encoded_images[[i]], height = "auto", width = "100%", style = "border-radius: 10px;"))
       })
 
-      # Render the tabsetPanel with the dynamically created tabPanels
       do.call(tabsetPanel, image_tabs)
     })
   })
@@ -254,7 +201,7 @@ mod_shroom_img_quiz_server <- function(id) {
 
 
 ## To be copied in the UI
-# mod_shroom_img_quiz_ui("shroom_img_quiz_1")
+# mod_shroom_img_quiz_level_1_ui("shroom_img_quiz_level_1_1")
 
 ## To be copied in the server
-# mod_shroom_img_quiz_server("shroom_img_quiz_1")
+# mod_shroom_img_quiz_level_1_server("shroom_img_quiz_level_1_1")

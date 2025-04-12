@@ -3,7 +3,9 @@ devtools::load_all(".")
 library(readxl)
 shroomGroups <- read_excel("data-raw/Lamellenpilze_Habitustypen_n_Merkmale.xlsx",
                                                     sheet = "Zuordnungen") %>%
-  select(genus = Gattung_sci, key1) %>% distinct() %>% filter(!is.na(genus))
+  # select(genus = Gattung_sci, key1) %>%
+  dplyr::rename(genus = Gattung_sci) %>%
+  distinct() %>% filter(!is.na(genus))
 # TODO ansscheinind sind manche gattungen in mehreren gruppen, versuche diese zu finden und versuche herauszufinden, wie sie Björn einordnet!
 
 usethis::use_data(shroomGroups, overwrite = TRUE)

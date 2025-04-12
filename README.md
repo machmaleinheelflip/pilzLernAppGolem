@@ -10,12 +10,6 @@
 
 -   genus, and famiy in german!
 
--   species abrage randomizen, aktuell gerade glaub chronologisch
-
--   Antwort möglichkeit randomizen, gerade immer 1. bild = 1. art, zweites bild = 2. art, drittes bild = 3. art ect.
-
--   bilder evtl in irgendeine cloud und dann per weblink abrufen und rendern! da nur 1gb shinyio ODER bei shiny io schaune, ob man es vergrösern kann
-
 -   wenn flasch kommt pup up nur einmal
 
 ## 18.01.25
@@ -25,3 +19,17 @@
 -   langing page mit stats über arten gruppen, e.g. 1250 pilzarten, 500 bienen, ... dann auch per button auswählen welche artgruppe man üben möchte
 
 -   level 2 vlt sowas wie dass man vorgeschlagene arten von selber gattung nimmt, level 1 eher selbe fam
+
+## 12.04.25
+
+-   Level 1: Art auf übergruppen- nivau erraten (e.g. Lammenpilz, Röhrling, Bauchling etc.)
+
+-   Level 2: Zumindest bei Lamellenpilzen dann auf Habitatstypebene erraten (für Röhrlinge mal schauen ob es da auch so Kurzschlüssel gibt) - entweder direkt oder noch mit Kurzschlüssel -\> Fleisch spröde ja/ nein, Lammellen frei ja/nein ...
+
+-   Level 3: Auf gattungsebene (direkt eingabe) oder nach korrektem Habitatstyp, auswahl an Gattungen
+
+-   Level 4: Artebene nach richtiger Gattungseingabe !
+
+-   Gamification
+
+    -   Man könnte zb anzeigen wie viel Reihen es insgesamt im Datensatz gibt und wie viele man davon schon richtig hat –\> d.h. im Code müssen bereits erratene Observations raus genommen werden + evtl ein cookie ding ... :/ UND/ ODER anzeigen wie viel pro Übergruppe schon richtig und falsch (röhrlinge, lammelen etc.) dann vlt einen datensatz erzwugen mit gleichvielen Obs. pro Gruppe ... e.g. max 100 pro gruppe
