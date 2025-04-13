@@ -166,12 +166,32 @@ mod_shroom_img_quiz_level_3_server <- function(id) {
 
       if (showing_species) {
         selected_species <- random_specs$data[selected_row_index(), "species_german"]
+        # Always trigger feedback for species selection
+        if (is.null(selected_species) || is.na(selected_species)) {
+          return() # Exit if no valid selection
+        }
         if (selected_species == values$current_species) {
           values$feedback <- "Richtig! Weiter zum nächsten Bild."
         } else {
           values$feedback <- "Falsch. Bitte erneut versuchen."
+          shinyalert(
+            title = "Leider falsch :(",
+            size = "xs",
+            closeOnClickOutside = TRUE,
+            html = FALSE,
+            type = "error",
+            showConfirmButton = TRUE,
+            confirmButtonText = "OK",
+            confirmButtonCol = "#AEDEF4",
+            animation = TRUE
+          )
+          updateReactable(
+            outputId = "species_table",
+            selected = NA
+          )
         }
       } else {
+        # ...existing code for key selection...
         selected_value <- random_specs$data[selected_row_index(), current_key]
         if (selected_value == values[[current_key]]) {
           # Get current species data
@@ -267,19 +287,19 @@ mod_shroom_img_quiz_level_3_server <- function(id) {
         values$feedback <- ""
       }
 
-      if (values$feedback == "Falsch. Bitte erneut versuchen.") {
-        shinyalert(
-          title = "Leider falsch :(",
-          size = "xs",
-          closeOnClickOutside = TRUE,
-          html = FALSE,
-          type = "error",
-          showConfirmButton = TRUE,
-          confirmButtonText = "OK",
-          confirmButtonCol = "#AEDEF4",
-          animation = TRUE
-        )
-      }
+      # if (values$feedback == "Falsch. Bitte erneut versuchen.") {
+      #   shinyalert(
+      #     title = "Leider falsch :(",
+      #     size = "xs",
+      #     closeOnClickOutside = TRUE,
+      #     html = FALSE,
+      #     type = "error",
+      #     showConfirmButton = TRUE,
+      #     confirmButtonText = "OK",
+      #     confirmButtonCol = "#AEDEF4",
+      #     animation = TRUE
+      #   )
+      # }
 
       updateReactable(
         outputId = "species_table",
