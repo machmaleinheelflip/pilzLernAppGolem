@@ -17,8 +17,8 @@ mod_shroom_overview_ui <- function(id) {
     shiny::selectInput(
       ns("level_selector"),
       label = "Choose a mode:",
-      choices = c("Classic", "Level 1", "Level 2", "Level 3", "Level 4"),
-      selected = "Classic"
+      choices = c("Anfänger", "Fortgeschritten (Gattungsnivau)", "Experte (Artniveau)", "Classic"),
+      selected = "Anfänger"
     ),
     uiOutput(ns("quiz_ui"))
   )
@@ -34,9 +34,9 @@ mod_shroom_overview_server <- function(id) {
     output$quiz_ui <- renderUI({
       switch(input$level_selector,
         "Classic" = mod_shroom_img_quiz_ui("shroom_img_quiz_1"),
-        "Level 1" = mod_shroom_img_quiz_level_1_ui("shroom_img_quiz_level_1_1"),
-        "Level 2" = mod_shroom_img_quiz_level_2_ui("shroom_img_quiz_level_2_1"),
-        "Level 3" = mod_shroom_img_quiz_level_3_ui("shroom_img_quiz_level_3_1")
+        "Anfänger" = mod_shroom_img_quiz_level_1_ui("shroom_img_quiz_level_1_1"),
+        "Fortgeschritten (Gattungsnivau)" = mod_shroom_img_quiz_level_2_ui("shroom_img_quiz_level_2_1"),
+        "Experte (Artniveau)" = mod_shroom_img_quiz_level_3_ui("shroom_img_quiz_level_3_1")
         # "Level 4" = mod_shroom_img_quiz_ui("shroom_img_quiz_4")
       )
     })
