@@ -37,21 +37,21 @@ mod_shroom_img_quiz_level_2_server <- function(id) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
-    # Remove browser() call
+    # browser()
     shrooms <- shrooms %>%
       filter(!is.na(species_german)) %>%
       left_join(shroomGroups, relationship = "many-to-one") %>%
       filter(!is.na(key1))
 
     # Add current column tracking
-    key_columns <- c("key1", "key2", "key3", "key4", "key5", "key6")
+    key_columns <- c("key2", "key3", "key4", "key5", "key6")
 
     random_species_number <- sample(1:length(unique(shrooms$species_german)), 1)
     values <- reactiveValues(
       current_species = shrooms$species_german[random_species_number],
       species = shrooms$species[random_species_number],
-      current_key_column = "key1",
-      key1 = shrooms$key1[random_species_number],
+      current_key_column = "key2",
+      key1 = shrooms$key1[random_species_number], # Keep this for filtering
       key2 = shrooms$key2[random_species_number],
       key3 = shrooms$key3[random_species_number],
       key4 = shrooms$key4[random_species_number],
@@ -68,46 +68,25 @@ mod_shroom_img_quiz_level_2_server <- function(id) {
       species_data <- shrooms %>%
         filter(species_german == values$current_species)
 
-      # Check if any values in current column are NA
-      if (current_key == "key6") {
-        # For final key, show all possible answers within the same group
-        prev_key <- key_columns[match(current_key, key_columns) - 1]
-        prev_key_value <- values[[prev_key]]
+      # Initialize with filtering by key1
+      filtered_data <- shrooms %>%
+        filter(key1 == values$key1)
 
-        if (any(is.na(species_data[[current_key]]))) {
-          values$feedback <- "Richtig! Weiter zum nächsten Bild."
-        } else {
-          random_specs$data <- shrooms %>%
-            filter(!!sym(prev_key) == prev_key_value) %>%
-            select(all_of(current_key)) %>%
-            unique() %>%
-            arrange(across(everything()))
-        }
-      } else {
-        # Check if any values in current column are NA or if we've reached the last column
-        current_idx <- match(current_key, key_columns)
-        if (any(is.na(species_data[[current_key]])) ||
-          (current_idx == length(key_columns) && selected_row_index() > 0)) {
-          values$feedback <- "Richtig! Weiter zum nächsten Bild."
-        } else {
-          # Create a filter based on previously selected keys
-          filter_expr <- quo(TRUE)
-
-          if (current_idx > 1) {
-            for (i in 1:(current_idx - 1)) {
-              prev_key <- key_columns[i]
-              filter_expr <- quo(!!filter_expr & !!sym(prev_key) == !!values[[prev_key]])
-            }
-          }
-
-          # Show unique values for current key column, filtered by previous selections
-          random_specs$data <- shrooms %>%
-            filter(!!filter_expr) %>%
-            select(all_of(current_key)) %>%
-            unique() %>%
-            arrange(across(everything()))
+      # Add filters for all previous keys up to current
+      current_idx <- match(current_key, key_columns)
+      if (current_idx > 1) {
+        for (i in 1:(current_idx - 1)) {
+          prev_key <- key_columns[i]
+          filtered_data <- filtered_data %>%
+            filter(!!sym(prev_key) == values[[prev_key]])
         }
       }
+
+      # Get unique values for current key from filtered data
+      random_specs$data <- filtered_data %>%
+        select(all_of(current_key)) %>%
+        unique() %>%
+        arrange(across(everything()))
     })
 
     # Update species_table render
@@ -138,7 +117,6 @@ mod_shroom_img_quiz_level_2_server <- function(id) {
         ),
         defaultSelected = NULL,
         columns = list(
-          key1 = colDef(name = "Gruppe"),
           key2 = colDef(name = "Untergruppe"),
           key3 = colDef(name = "Detail 1"),
           key4 = colDef(name = "Detail 2"),
@@ -244,13 +222,17 @@ mod_shroom_img_quiz_level_2_server <- function(id) {
         next_index <- sample(1:length(unique(shrooms$species_german)), 1)
         values$current_species <- shrooms$species_german[next_index]
         values$species <- shrooms$species[next_index]
-        values$current_key_column <- "key1"
+        values$current_key_column <- "key2" # Start with key2 instead of key1
 
         # Update all keys for new species
         species_data <- shrooms %>%
           filter(species_german == values$current_species) %>%
           slice(1)
 
+        # Update key1 first
+        values$key1 <- species_data$key1
+
+        # Then update the rest of the keys
         for (key in key_columns) {
           values[[key]] <- species_data[[key]]
         }
