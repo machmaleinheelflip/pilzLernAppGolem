@@ -11,7 +11,7 @@
 #' @import base64enc
 #' @import reactable
 #' @import shinyalert
-mod_shroom_img_quiz_level_2_ui <- function(id) {
+mod_shroom_img_quiz_level_3_ui <- function(id) {
   ns <- NS(id)
   tagList(
     layout_columns(
@@ -33,7 +33,7 @@ mod_shroom_img_quiz_level_2_ui <- function(id) {
 #' shroom_img_quiz Server Functions
 #'
 #' @noRd
-mod_shroom_img_quiz_level_2_server <- function(id) {
+mod_shroom_img_quiz_level_3_server <- function(id) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
@@ -82,23 +82,11 @@ mod_shroom_img_quiz_level_2_server <- function(id) {
         }
       }
 
-      # Check if we're at the final key (next key has NA values)
-      next_idx <- current_idx + 1
-      is_final_key <- next_idx > length(key_columns) ||
-        all(is.na(species_data[[key_columns[next_idx]]]))
-
       # Get unique values for current key from filtered data
-      if (is_final_key) {
-        random_specs$data <- filtered_data %>%
-          select(all_of(current_key), genus) %>%
-          unique() %>%
-          arrange(across(everything()))
-      } else {
-        random_specs$data <- filtered_data %>%
-          select(all_of(current_key)) %>%
-          unique() %>%
-          arrange(across(everything()))
-      }
+      random_specs$data <- filtered_data %>%
+        select(all_of(current_key)) %>%
+        unique() %>%
+        arrange(across(everything()))
     })
 
     # Update species_table render
@@ -107,26 +95,6 @@ mod_shroom_img_quiz_level_2_server <- function(id) {
       req(random_specs$data)
 
       current_key <- values$current_key_column
-
-      # Define columns dynamically based on whether genus is present
-      cols <- if ("genus" %in% names(random_specs$data)) {
-        list(
-          key2 = colDef(name = "Untergruppe"),
-          key3 = colDef(name = "Detail 1"),
-          key4 = colDef(name = "Detail 2"),
-          key5 = colDef(name = "Detail 3"),
-          key6 = colDef(name = "Art"),
-          genus = colDef(name = "Wissenschaftlicher Name")
-        )
-      } else {
-        list(
-          key2 = colDef(name = "Untergruppe"),
-          key3 = colDef(name = "Detail 1"),
-          key4 = colDef(name = "Detail 2"),
-          key5 = colDef(name = "Detail 3"),
-          key6 = colDef(name = "Art")
-        )
-      }
 
       reactable(
         data = random_specs$data,
@@ -148,7 +116,13 @@ mod_shroom_img_quiz_level_2_server <- function(id) {
           align = "left"
         ),
         defaultSelected = NULL,
-        columns = cols
+        columns = list(
+          key2 = colDef(name = "Untergruppe"),
+          key3 = colDef(name = "Detail 1"),
+          key4 = colDef(name = "Detail 2"),
+          key5 = colDef(name = "Detail 3"),
+          key6 = colDef(name = "Art")
+        )
       )
     })
 
@@ -206,59 +180,20 @@ mod_shroom_img_quiz_level_2_server <- function(id) {
     })
 
     observeEvent(input$show_solution, {
-      # Get current species data including genus
-      current_species_data <- shrooms %>%
-        filter(species_german == values$current_species) %>%
-        select(species_german, genus) %>%
-        slice(1)
-
-      shinyalert(
-        title = paste(
-          "Lösung:", current_species_data$species_german,
-          "\nWissenschaftlicher Name:", current_species_data$genus
-        ),
-        size = "xs",
-        closeOnClickOutside = TRUE,
-        html = FALSE,
-        type = "info",
-        showConfirmButton = TRUE,
-        confirmButtonText = "OK",
-        confirmButtonCol = "#AEDEF4",
-        animation = TRUE
+      values$feedback <- paste("Lösung: ", values$key1)
+      updateReactable(
+        outputId = "species_table",
+        data = random_specs$data,
+        selected = NA
       )
-
-      # Reset to a new species after showing solution
-      next_index <- sample(1:length(unique(shrooms$species_german)), 1)
-      values$current_species <- shrooms$species_german[next_index]
-      values$species <- shrooms$species[next_index]
-      values$current_key_column <- "key2" # Start with key2 instead of key1
-
-      # Update all keys for new species
-      species_data <- shrooms %>%
-        filter(species_german == values$current_species) %>%
-        slice(1)
-
-      # Update key1 first
-      values$key1 <- species_data$key1
-
-      # Then update the rest of the keys
-      for (key in key_columns) {
-        values[[key]] <- species_data[[key]]
-      }
     })
 
     observeEvent(values$feedback, {
       if (values$feedback == "Richtig! Weiter zum nächsten Bild." ||
         values$feedback == paste("Lösung: ", values[[values$current_key_column]])) {
         if (values$feedback == paste("Lösung: ", values$key1)) {
-          # Get the scientific genus for the current species
-          current_genus <- shrooms %>%
-            filter(species_german == values$current_species) %>%
-            pull(genus) %>%
-            first()
-
           shinyalert(
-            title = paste("Lösung: ", values$key1, "\nWissenschaftlicher Name: ", current_genus),
+            title = paste("Lösung: ", values$key1),
             size = "xs",
             closeOnClickOutside = TRUE,
             html = FALSE,
@@ -271,14 +206,8 @@ mod_shroom_img_quiz_level_2_server <- function(id) {
         }
 
         if (values$feedback == "Richtig! Weiter zum nächsten Bild.") {
-          # Get the scientific genus for the current species
-          current_genus <- shrooms %>%
-            filter(species_german == values$current_species) %>%
-            pull(genus) %>%
-            first()
-
           shinyalert(
-            title = paste("Richtig! :)\nWissenschaftlicher Name: ", current_genus),
+            title = "Richtig! :)",
             size = "xs",
             closeOnClickOutside = TRUE,
             html = FALSE,
@@ -351,7 +280,7 @@ mod_shroom_img_quiz_level_2_server <- function(id) {
 
 
 ## To be copied in the UI
-# mod_shroom_img_quiz_level_2_ui("shroom_img_quiz_level_2_1")
+# mod_shroom_img_quiz_level_3_ui("shroom_img_quiz_level_3_1")
 
 ## To be copied in the server
-# mod_shroom_img_quiz_level_2_server("shroom_img_quiz_level_2_1")
+# mod_shroom_img_quiz_level_3_server("shroom_img_quiz_level_3_1")
