@@ -20,7 +20,7 @@ mod_shroom_img_quiz_level_2_ui <- function(id) {
         uiOutput(ns("shroom_images")) # Display images in tabs for each species
       ),
       card(
-        max_height = "375px",
+        # max_height = "375px",
         reactableOutput(ns("species_table")), # Table for selecting species
         # textOutput(ns("feedback")),
         actionButton(ns("show_solution"), "Ich weis es nicht.")

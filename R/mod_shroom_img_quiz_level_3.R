@@ -20,7 +20,7 @@ mod_shroom_img_quiz_level_3_ui <- function(id) {
         uiOutput(ns("shroom_images")) # Display images in tabs for each species
       ),
       card(
-        max_height = "375px",
+        # max_height = "375px",
         reactableOutput(ns("species_table")), # Table for selecting species
         # textOutput(ns("feedback")),
         actionButton(ns("show_solution"), "Ich weis es nicht.")
@@ -82,11 +82,33 @@ mod_shroom_img_quiz_level_3_server <- function(id) {
         }
       }
 
-      # Get unique values for current key from filtered data
-      random_specs$data <- filtered_data %>%
-        select(all_of(current_key)) %>%
-        unique() %>%
-        arrange(across(everything()))
+      # Check if next key (if exists) has NA values
+      next_idx <- current_idx + 1
+      show_species <- FALSE
+      if (next_idx <= length(key_columns)) {
+        next_key <- key_columns[next_idx]
+        if (all(is.na(species_data[[next_key]]))) {
+          show_species <- TRUE
+        }
+      }
+
+      # Get data for table
+      if (show_species) {
+        random_specs$data <- filtered_data %>%
+          select(species_german) %>%
+          unique() %>%
+          arrange(across(everything()))
+      } else {
+        random_specs$data <- filtered_data %>%
+          select(all_of(current_key)) %>%
+          unique() %>%
+          arrange(across(everything()))
+      }
+    })
+
+    # Define selected_row_index reactive
+    selected_row_index <- reactive({
+      getReactableState("species_table", name = "selected", session = session)
     })
 
     # Update species_table render
@@ -95,6 +117,21 @@ mod_shroom_img_quiz_level_3_server <- function(id) {
       req(random_specs$data)
 
       current_key <- values$current_key_column
+
+      # Determine columns based on whether we're showing species or keys
+      cols <- if ("species_german" %in% names(random_specs$data)) {
+        list(
+          species_german = colDef(name = "Art")
+        )
+      } else {
+        list(
+          key2 = colDef(name = "Untergruppe"),
+          key3 = colDef(name = "Detail 1"),
+          key4 = colDef(name = "Detail 2"),
+          key5 = colDef(name = "Detail 3"),
+          key6 = colDef(name = "Art")
+        )
+      }
 
       reactable(
         data = random_specs$data,
@@ -116,62 +153,52 @@ mod_shroom_img_quiz_level_3_server <- function(id) {
           align = "left"
         ),
         defaultSelected = NULL,
-        columns = list(
-          key2 = colDef(name = "Untergruppe"),
-          key3 = colDef(name = "Detail 1"),
-          key4 = colDef(name = "Detail 2"),
-          key5 = colDef(name = "Detail 3"),
-          key6 = colDef(name = "Art")
-        )
+        columns = cols
       )
     })
 
-    # Update selection handler
-    selected_row_index <- reactive(reactable::getReactableState("species_table", "selected", session))
-
     observeEvent(selected_row_index(), {
+      req(selected_row_index()) # Ensure we have a selection
       current_key <- values$current_key_column
-      selected_value <- random_specs$data[selected_row_index(), current_key]
 
-      if (selected_value == values[[current_key]]) {
-        # Get current species data
-        species_data <- shrooms %>%
-          filter(species_german == values$current_species)
+      # Get if we're showing species or keys
+      showing_species <- "species_german" %in% names(random_specs$data)
 
-        # Get index of next column
-        current_idx <- match(current_key, key_columns)
-        next_idx <- current_idx + 1
-
-        # Check if next column exists and has non-NA values
-        if (next_idx <= length(key_columns) &&
-          !all(is.na(species_data[[key_columns[next_idx]]]))) {
-          values$current_key_column <- key_columns[next_idx]
-          updateReactable(
-            outputId = "species_table",
-            selected = NA
-          )
-        } else {
+      if (showing_species) {
+        selected_species <- random_specs$data[selected_row_index(), "species_german"]
+        if (selected_species == values$current_species) {
           values$feedback <- "Richtig! Weiter zum nächsten Bild."
+        } else {
+          values$feedback <- "Falsch. Bitte erneut versuchen."
         }
       } else {
-        values$feedback <- "Falsch. Bitte erneut versuchen."
-        shinyalert(
-          title = "Leider falsch :(",
-          size = "xs",
-          closeOnClickOutside = TRUE,
-          html = FALSE,
-          type = "error",
-          showConfirmButton = TRUE,
-          confirmButtonText = "OK",
-          confirmButtonCol = "#AEDEF4",
-          animation = TRUE
-        )
-        # Reset feedback after showing the alert
-        values$feedback <- ""
-        updateReactable(
-          outputId = "species_table",
-          selected = NA
-        )
+        selected_value <- random_specs$data[selected_row_index(), current_key]
+        if (selected_value == values[[current_key]]) {
+          # Get current species data
+          species_data <- shrooms %>%
+            filter(species_german == values$current_species)
+
+          # Get index of next column
+          current_idx <- match(current_key, key_columns)
+          next_idx <- current_idx + 1
+
+          # Check if next column exists and has non-NA values
+          if (next_idx <= length(key_columns)) {
+            if (!all(is.na(species_data[[key_columns[next_idx]]]))) {
+              values$current_key_column <- key_columns[next_idx]
+            } else {
+              values$current_key_column <- "species_german"
+            }
+            updateReactable(
+              outputId = "species_table",
+              selected = NA
+            )
+          } else {
+            values$feedback <- "Richtig! Weiter zum nächsten Bild."
+          }
+        } else {
+          values$feedback <- "Falsch. Bitte erneut versuchen."
+        }
       }
     })
 
