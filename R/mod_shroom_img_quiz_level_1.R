@@ -20,7 +20,7 @@ mod_shroom_img_quiz_level_1_ui <- function(id) {
         uiOutput(ns("shroom_images")) # Display images in tabs for each species
       ),
       card(
-        max_height = "375px",
+        # max_height = "375px",
         reactableOutput(ns("species_table")), # Table for selecting species
         # textOutput(ns("feedback")),
         actionButton(ns("show_solution"), "Ich weis es nicht.")
@@ -40,7 +40,11 @@ mod_shroom_img_quiz_level_1_server <- function(id) {
     shrooms <- shrooms %>%
       filter(!is.na(species_german)) %>%
       left_join(shroomGroups, relationship = "many-to-one") %>%
-      filter(!is.na(key1))
+      filter(!is.na(key1)) %>%
+      # make equaliy sized samples of each key1 group
+      group_by(key1) %>%
+      slice_sample(n = 50) %>%
+      ungroup()
 
     random_species_number <- sample(1:length(unique(shrooms$species_german)), 1)
     values <- reactiveValues(
